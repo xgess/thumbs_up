@@ -87,7 +87,7 @@ You can easily retrieve voteable object collections based on the properties of t
           :order => "items.name DESC"
       })
 
-This will select the Items with between 1 and 10,000 votes, the votes having been cast within the last two weeks (not including today), then display the 10 last items in an alphabetical list.
+This will select the Items with between 1 and 10,000 votes, the votes having been cast within the last two weeks (not including today), then display the 10 last items in an alphabetical list. This tallies all votes, regardless of whether they are +1 (up) or -1 (down).
 
 ##### Tally Options:
     :start_at    - Restrict the votes to those created after a certain time
@@ -98,13 +98,12 @@ This will select the Items with between 1 and 10,000 votes, the votes having bee
     :at_least    - Item must have at least X votes
     :at_most     - Item may not have more than X votes
 
-##### Tallying Rank
+##### Tallying Rank ("Plusminus")
 
-Similar to tallying votes, but this will actually return voteable object collections based on a rating 
-system where up votes and down votes get equal rating.  For Instance, a voteable with 3 upvotes and 2 
-downvotes will have a rating in this instance of 1.
+This is similar to tallying votes, but this will return voteable object collections based on the sum of the differences between up and down votes (ups are +1, downs are -1). For Instance, a voteable with 3 upvotes and 2 
+downvotes will have a plusminus of 1.
 
-##### Rank_Tally Options:
+##### Plusminus Tally Options:
     :start_at    - Restrict the votes to those created after a certain time
     :end_at      - Restrict the votes to those created before a certain time
     :conditions  - A piece of SQL conditions to add to the query
@@ -117,7 +116,7 @@ downvotes will have a rating in this instance of 1.
 
     positiveVoteCount = voteable.votes_for
     negativeVoteCount = voteable.votes_against
-    plusminus         = voteable.plusminus  # Votes for minus votes against.
+    plusminus         = voteable.plusminus  # Votes for, minus votes against.
 
 	voter.voted_for?(voteable) # True if the voter voted for this object.
 	voter.vote_count(:up | :down | :all) # returns the count of +1, -1, or all votes
@@ -134,7 +133,7 @@ ThumbsUp by default only allows one vote per user. This can be changed by removi
 
     validates_uniqueness_of :voteable_id, :scope => [:voteable_type, :voter_type, :voter_id]
 
-#### In the migration:
+#### In the migration, the unique index:
 
     add_index :votes, ["voter_id", "voter_type", "voteable_id", "voteable_type"], :unique => true, :name => "uniq_one_vote_only"
 

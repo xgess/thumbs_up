@@ -22,7 +22,7 @@ module ThumbsUp #:nodoc:
       ## Not yet implemented. Don't use it!
       # Find the most popular users
       def find_most_karmic
-        find(:all)
+        self.all
       end
 
     end
