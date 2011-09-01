@@ -1,4 +1,4 @@
-require 'helper'
+require File.join(File.expand_path(File.dirname(__FILE__)), 'test_helper')
 
 class TestThumbsUp < Test::Unit::TestCase
   def setup
