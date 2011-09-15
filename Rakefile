@@ -33,7 +33,6 @@ end
 require 'rdoc/task'
 Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "leaderboard #{version}"
   rdoc.rdoc_files.include('README*')
