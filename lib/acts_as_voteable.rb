@@ -51,8 +51,9 @@ module ThumbsUp
             AS joined_#{Vote.table_name} ON #{self.table_name}.#{self.primary_key} =
             joined_#{Vote.table_name}.voteable_id")
 
-            t = t.where("joined_#{Vote.table_name}.voteable_type = '#{self.name}'")
             t = t.group("joined_#{Vote.table_name}.voteable_id, joined_#{Vote.table_name}.vote_total, #{column_names_for_tally}")
+            t = t.limit(options[:limit]) if options[:limit]
+            t = t.where("joined_#{Vote.table_name}.voteable_type = '#{self.name}'")
             t = t.where("joined_#{Vote.table_name}.created_at >= ?", options[:start_at]) if options[:start_at]
             t = t.where("joined_#{Vote.table_name}.created_at <= ?", options[:end_at]) if options[:end_at]
             t = options[:ascending] ? t.order("joined_#{Vote.table_name}.vote_total") : t.order("joined_#{Vote.table_name}.vote_total DESC")

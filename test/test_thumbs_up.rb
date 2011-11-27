@@ -145,13 +145,13 @@ class TestThumbsUp < Test::Unit::TestCase
     assert_equal 2, Item.tally(:start_at => 3.days.ago, :end_at => 4.days.from_now).length
   end
 
-  def test_rank_tally_empty
+  def test_plusminus_tally_empty
     item = Item.create(:name => 'XBOX', :description => 'XBOX console')
 
-    assert_equal 0, Item.rank_tally.length
+    assert_equal 0, Item.plusminus_tally.length
   end
 
-  def test_rank_tally_starts_at
+  def test_plusminus_tally_starts_at
     item = Item.create(:name => 'XBOX', :description => 'XBOX console')
     user = User.create(:name => 'david')
 
@@ -159,11 +159,11 @@ class TestThumbsUp < Test::Unit::TestCase
     vote.created_at = 3.days.ago
     vote.save
 
-    assert_equal 0, Item.rank_tally(:start_at => 2.days.ago).length
-    assert_equal 1, Item.rank_tally(:start_at => 4.days.ago).length
+    assert_equal 0, Item.plusminus_tally(:start_at => 2.days.ago).length
+    assert_equal 1, Item.plusminus_tally(:start_at => 4.days.ago).length
   end
 
-  def test_rank_tally_end_at
+  def test_plusminus_tally_end_at
     item = Item.create(:name => 'XBOX', :description => 'XBOX console')
     user = User.create(:name => 'david')
 
@@ -171,11 +171,11 @@ class TestThumbsUp < Test::Unit::TestCase
     vote.created_at = 3.days.from_now
     vote.save
 
-    assert_equal 0, Item.rank_tally(:end_at => 2.days.from_now).length
-    assert_equal 1, Item.rank_tally(:end_at => 4.days.from_now).length
+    assert_equal 0, Item.plusminus_tally(:end_at => 2.days.from_now).length
+    assert_equal 1, Item.plusminus_tally(:end_at => 4.days.from_now).length
   end
 
-  def test_rank_tally_between_start_at_end_at
+  def test_plusminus_tally_between_start_at_end_at
     item = Item.create(:name => 'XBOX', :description => 'XBOX console')
     another_item = Item.create(:name => 'XBOX', :description => 'XBOX console')
     user = User.create(:name => 'david')
@@ -188,22 +188,22 @@ class TestThumbsUp < Test::Unit::TestCase
     vote.created_at = 3.days.from_now
     vote.save
 
-    assert_equal 1, Item.rank_tally(:start_at => 3.days.ago, :end_at => 2.days.from_now).length
-    assert_equal 2, Item.rank_tally(:start_at => 3.days.ago, :end_at => 4.days.from_now).length
+    assert_equal 1, Item.plusminus_tally(:start_at => 3.days.ago, :end_at => 2.days.from_now).length
+    assert_equal 2, Item.plusminus_tally(:start_at => 3.days.ago, :end_at => 4.days.from_now).length
   end
 
-  def test_rank_tally_inclusion
+  def test_plusminus_tally_inclusion
     user = User.create(:name => 'david')
     item = Item.create(:name => 'XBOX', :description => 'XBOX console')
     item_not_included = Item.create(:name => 'Playstation', :description => 'Playstation console')
 
     assert_not_nil user.vote_for(item)
 
-    assert (Item.rank_tally.include? item)
-    assert (not Item.rank_tally.include? item_not_included)
+    assert (Item.plusminus_tally.include? item)
+    assert (not Item.plusminus_tally.include? item_not_included)
   end
 
-  def test_rank_tally_default_ordering
+  def test_plusminus_tally_default_ordering
     user = User.create(:name => 'david')
     item_for = Item.create(:name => 'XBOX', :description => 'XBOX console')
     item_against = Item.create(:name => 'Playstation', :description => 'Playstation console')
@@ -211,11 +211,19 @@ class TestThumbsUp < Test::Unit::TestCase
     assert_not_nil user.vote_for(item_for)
     assert_not_nil user.vote_against(item_against)
 
-    assert_equal item_for, Item.rank_tally[0]
-    assert_equal item_against, Item.rank_tally[1]
+    assert_equal item_for, Item.plusminus_tally[0]
+    assert_equal item_against, Item.plusminus_tally[1]
+  end
+  
+  def test_plusminus_tally_limit
+    users = (0..9).map{ |u| User.create(:name => "User #{u}") }
+    items = (0..9).map{ |u| Item.create(:name => "Item #{u}", :description => "Item #{u}") }
+    users.each{ |u| items.each { |i| u.vote_for(i) } }
+    assert_equal 10, Item.plusminus_tally.length
+    assert_equal 2, Item.plusminus_tally(:limit => 2).length
   end
 
-  def test_rank_tally_ascending_ordering
+  def test_plusminus_tally_ascending_ordering
     user = User.create(:name => 'david')
     item_for = Item.create(:name => 'XBOX', :description => 'XBOX console')
     item_against = Item.create(:name => 'Playstation', :description => 'Playstation console')
@@ -223,7 +231,16 @@ class TestThumbsUp < Test::Unit::TestCase
     assert_not_nil user.vote_for(item_for)
     assert_not_nil user.vote_against(item_against)
 
-    assert_equal item_for, Item.rank_tally(:ascending => true)[1]
-    assert_equal item_against, Item.rank_tally(:ascending => true)[0]
+    assert_equal item_for, Item.plusminus_tally(:ascending => true)[1]
+    assert_equal item_against, Item.plusminus_tally(:ascending => true)[0]
+  end
+  
+  def test_karma
+    users = (0..1).map{ |u| User.create(:name => "User #{u}") }
+    items = (0..1).map{ |u| users[0].items.create(:name => "Item #{u}", :description => "Item #{u}") }
+    users.each{ |u| items.each { |i| u.vote_for(i) } }
+    
+    assert_equal 4, users[0].karma
+    assert_equal 0, users[1].karma
   end
 end

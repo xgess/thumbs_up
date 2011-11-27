@@ -34,8 +34,9 @@ ActiveRecord::Schema.define do
   end
   
   create_table :items, :force => true do |t|
-    t.string :name
-    t.string :description
+    t.integer :user_id
+    t.string  :name
+    t.string  :description
   end
 end
 
@@ -57,12 +58,15 @@ class Vote < ActiveRecord::Base
   validates_uniqueness_of :voteable_id, :scope => [:voteable_type, :voter_type, :voter_id]
 end
 
-class User < ActiveRecord::Base
-  acts_as_voter
-end
-
 class Item < ActiveRecord::Base
   acts_as_voteable
+  belongs_to :user
+end
+
+class User < ActiveRecord::Base
+  acts_as_voter
+  has_many :items
+  has_karma(:items)
 end
 
 class Test::Unit::TestCase
