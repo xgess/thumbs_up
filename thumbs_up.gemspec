@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "thumbs_up"
-  s.version = "0.4.4"
+  s.version = File.read('./VERSION').strip
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brady Bouchard", "Peter Jackson", "Cosmin Radoi", "Bence Nagy", "Rob Maddox", "Wojciech Wnetrzak"]
