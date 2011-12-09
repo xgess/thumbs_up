@@ -75,7 +75,7 @@ Did the first user vote for the Car with id = 2 already?
     u.vote_for(Car.find(2))
     u.voted_on?(Car.find(2)) #=> true
 	
-Did the first user vote for or agains the Car with id = 2?
+Did the first user vote for or against the Car with id = 2?
 
     u = User.first
     u.vote_for(Car.find(2))
