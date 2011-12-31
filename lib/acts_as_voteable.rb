@@ -27,6 +27,7 @@ module ThumbsUp
       #  :ascending           - Default false - normal order DESC (i.e. highest rank to lowest)
       #  :at_least            - Default 1 - Item must have at least X votes
       #  :at_most             - Item may not have more than X votes
+      #  :conditions          - (string) Extra conditions, if you'd like.
       def plusminus_tally(*args)
         options = args.extract_options!
 
@@ -56,6 +57,7 @@ module ThumbsUp
             t = t.where("joined_#{Vote.table_name}.voteable_type = '#{self.name}'")
             t = t.where("joined_#{Vote.table_name}.created_at >= ?", options[:start_at]) if options[:start_at]
             t = t.where("joined_#{Vote.table_name}.created_at <= ?", options[:end_at]) if options[:end_at]
+            t = t.where(options[:conditions]) if options[:conditions]
             t = options[:ascending] ? t.order("joined_#{Vote.table_name}.vote_total") : t.order("joined_#{Vote.table_name}.vote_total DESC")
 
             t = t.having([
