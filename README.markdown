@@ -107,7 +107,7 @@ This will select the Items with between 1 and 10,000 votes, the votes having bee
     :at_least    - Item must have at least X votes
     :at_most     - Item may not have more than X votes
 
-##### Tallying Rank ("Plusminus")
+#### Tallying Rank ("Plusminus")
 
 **You most likely want to use this over the normal tally**
 
