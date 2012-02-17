@@ -7,10 +7,18 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'active_record'
 
-ActiveRecord::Base.establish_connection(
-  :adapter => "sqlite3",
-  :database => ":memory:"
-)
+config = {
+  :adapter => 'mysql2',
+  :database => 'thumbs_up_test',
+  :username => 'test',
+  :password => 'test',
+  :socket => '/tmp/mysql.sock'
+}
+
+ActiveRecord::Base.establish_connection(config)
+ActiveRecord::Base.connection.drop_database config[:database] rescue nil
+ActiveRecord::Base.connection.create_database config[:database]
+ActiveRecord::Base.establish_connection(config)
 
 ActiveRecord::Migration.verbose = false
 

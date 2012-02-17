@@ -1,6 +1,8 @@
 ThumbsUp
 =======
 
+**Note: Version 0.5.x is a breaking change for #plusminus_tally and #tally, with > 50% speedups.**
+
 A ridiculously straightforward and simple package 'o' code to enable voting in your application, a la stackoverflow.com, etc.
 Allows an arbitrary number of entities (users, etc.) to vote on models.
 
@@ -88,51 +90,17 @@ Did the first user vote for or against the Car with id = 2?
 
 You can easily retrieve voteable object collections based on the properties of their votes:
 
-    @items = Item.tally(
-      {  :at_least => 1,
-          :at_most => 10000,
-          :start_at => 2.weeks.ago,
-          :end_at => 1.day.ago,
-          :limit => 10,
-          :order => "items.name DESC"
-      })
+    @items = Item.tally.limit(10).where('created_at > ?', 2.days.ago).having('vote_count < 10')
 
-This will select the Items with between 1 and 10,000 votes, the votes having been cast within the last two weeks (not including today), then display the 10 last items in an alphabetical list. *This tallies all votes, regardless of whether they are +1 (up) or -1 (down).*
-
-
-##### Tally Options:
-    :start_at    - Restrict the votes to those created after a certain time
-    :end_at      - Restrict the votes to those created before a certain time
-    :conditions  - A piece of SQL conditions to add to the query
-    :limit       - The maximum number of voteables to return
-    :order       - A piece of SQL to order by. Eg 'votes.count desc' or 'voteable.created_at desc'
-    :at_least    - Item must have at least X votes
-    :at_most     - Item may not have more than X votes
+This will select the Items with less than 10 votes, the votes having been cast within the last two days, with a limit of 10 items. *This tallies all votes, regardless of whether they are +1 (up) or -1 (down).* The #tally method returns an ActiveRecord Relation, so you can chain the normal method calls on to it.
 
 #### Tallying Rank ("Plusminus")
 
 **You most likely want to use this over the normal tally**
 
-This is similar to tallying votes, but this will return voteable object collections based on the sum of the differences between up and down votes (ups are +1, downs are -1). For Instance, a voteable with 3 upvotes and 2 
-downvotes will have a plusminus of 1.
+This is similar to tallying votes, but this will return voteable object collections based on the sum of the differences between up and down votes (ups are +1, downs are -1). For Instance, a voteable with 3 upvotes and 2 downvotes will have a plusminus of 1.
 
-    @items = Item.plusminus_tally(
-      {  :at_least => 1,
-          :at_most => 10000,
-          :start_at => 2.weeks.ago,
-          :end_at => 1.day.ago,
-          :limit => 10,
-          :order => "items.name DESC"
-      })
-
-##### Plusminus Tally Options:
-    :start_at    - Restrict the votes to those created after a certain time
-    :end_at      - Restrict the votes to those created before a certain time
-    :conditions  - A piece of SQL conditions to add to the query
-    :limit       - The maximum number of voteables to return
-    :ascending   - Boolean Default false.  If specified true, results will be returned in ascending order (from bottom up)
-    :at_least    - Item must have at least X votes
-    :at_most     - Item may not have more than X votes
+    @items = Item.plusminus_tally.limit(10).where('created_at > ?', 2.days.ago).having('plusminus > 10')
 
 #### Lower level queries
 
@@ -162,6 +130,19 @@ ThumbsUp by default only allows one vote per user. This can be changed by removi
 You can also use `--unique-voting false` when running the generator command:
 
     rails generate thumbs_up --unique-voting false
+
+#### Testing ThumbsUp
+
+Testing is a bit more than trivial now as our #tally and #plusminus_tally queries don't function properly under SQLite. To set up for testing:
+
+```
+$ mysql -uroot # You may have set a password locally. Change as needed.
+  > GRANT ALL PRIVILEGES ON 'thumbs_up_test' to 'test'@'localhost' IDENTIFIED BY 'test';
+  > CREATE DATABASE 'thumbs_up_test';
+  > exit;
+
+$ rake # Runs the test suite.
+```
 
 Credits
 =======

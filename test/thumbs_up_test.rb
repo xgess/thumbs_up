@@ -100,8 +100,7 @@ class TestThumbsUp < Test::Unit::TestCase
 
   def test_tally_empty
     item = Item.create(:name => 'XBOX', :description => 'XBOX console')
-
-    assert_equal 0, Item.tally.length
+    assert_equal 0, Item.tally.having('vote_count > 0').length
   end
 
   def test_tally_starts_at
@@ -112,8 +111,8 @@ class TestThumbsUp < Test::Unit::TestCase
     vote.created_at = 3.days.ago
     vote.save
 
-    assert_equal 0, Item.tally(:start_at => 2.days.ago).length
-    assert_equal 1, Item.tally(:start_at => 4.days.ago).length
+    assert_equal 0, Item.tally.where('created_at > ?', 2.days.ago).length
+    assert_equal 1, Item.tally.where('created_at > ?', 4.days.ago).length
   end
 
   def test_tally_end_at
@@ -124,8 +123,8 @@ class TestThumbsUp < Test::Unit::TestCase
     vote.created_at = 3.days.from_now
     vote.save
 
-    assert_equal 0, Item.tally(:end_at => 2.days.from_now).length
-    assert_equal 1, Item.tally(:end_at => 4.days.from_now).length
+    assert_equal 0, Item.tally.where('created_at < ?', 2.days.from_now).length
+    assert_equal 1, Item.tally.where('created_at < ?', 4.days.from_now).length
   end
 
   def test_tally_between_start_at_end_at
@@ -141,14 +140,18 @@ class TestThumbsUp < Test::Unit::TestCase
     vote.created_at = 3.days.from_now
     vote.save
 
-    assert_equal 1, Item.tally(:start_at => 3.days.ago, :end_at => 2.days.from_now).length
-    assert_equal 2, Item.tally(:start_at => 3.days.ago, :end_at => 4.days.from_now).length
+    assert_equal 1, Item.tally.where('created_at > ?', 3.days.ago).where('created_at < ?', 2.days.from_now).length
+    assert_equal 2, Item.tally.where('created_at > ?', 3.days.ago).where('created_at < ?', 4.days.from_now).length
+  end
+
+  def test_plusminus_tally_not_empty_without_conditions
+    item = Item.create(:name => 'XBOX', :description => 'XBOX console')
+    assert_equal 1, Item.plusminus_tally.length
   end
 
   def test_plusminus_tally_empty
     item = Item.create(:name => 'XBOX', :description => 'XBOX console')
-
-    assert_equal 0, Item.plusminus_tally.length
+    assert_equal 0, Item.plusminus_tally.having('vote_count > 0').length
   end
 
   def test_plusminus_tally_starts_at
@@ -159,8 +162,8 @@ class TestThumbsUp < Test::Unit::TestCase
     vote.created_at = 3.days.ago
     vote.save
 
-    assert_equal 0, Item.plusminus_tally(:start_at => 2.days.ago).length
-    assert_equal 1, Item.plusminus_tally(:start_at => 4.days.ago).length
+    assert_equal 0, Item.plusminus_tally.where('created_at > ?', 2.days.ago).length
+    assert_equal 1, Item.plusminus_tally.where('created_at > ?', 4.days.ago).length
   end
 
   def test_plusminus_tally_end_at
@@ -171,8 +174,8 @@ class TestThumbsUp < Test::Unit::TestCase
     vote.created_at = 3.days.from_now
     vote.save
 
-    assert_equal 0, Item.plusminus_tally(:end_at => 2.days.from_now).length
-    assert_equal 1, Item.plusminus_tally(:end_at => 4.days.from_now).length
+    assert_equal 0, Item.plusminus_tally.where('created_at < ?', 2.days.from_now).length
+    assert_equal 1, Item.plusminus_tally.where('created_at < ?', 4.days.from_now).length
   end
 
   def test_plusminus_tally_between_start_at_end_at
@@ -188,8 +191,8 @@ class TestThumbsUp < Test::Unit::TestCase
     vote.created_at = 3.days.from_now
     vote.save
 
-    assert_equal 1, Item.plusminus_tally(:start_at => 3.days.ago, :end_at => 2.days.from_now).length
-    assert_equal 2, Item.plusminus_tally(:start_at => 3.days.ago, :end_at => 4.days.from_now).length
+    assert_equal 1, Item.plusminus_tally.where('created_at > ?', 3.days.ago).where('created_at < ?', 2.days.from_now).length
+    assert_equal 2, Item.plusminus_tally.where('created_at > ?', 3.days.ago).where('created_at < ?', 4.days.from_now).length
   end
 
   def test_plusminus_tally_inclusion
@@ -199,20 +202,47 @@ class TestThumbsUp < Test::Unit::TestCase
 
     assert_not_nil user.vote_for(item)
 
-    assert (Item.plusminus_tally.include? item)
-    assert (not Item.plusminus_tally.include? item_not_included)
+    assert (Item.plusminus_tally.having('vote_count > 0').include? item)
+    assert (not Item.plusminus_tally.having('vote_count > 0').include? item_not_included)
+  end
+
+  def test_plusminus_tally_voting_for
+    user1 = User.create(:name => 'david')
+    item = Item.create(:name => 'Playstation', :description => 'Playstation console')
+
+    assert_not_nil user1.vote_for(item)
+
+    assert_equal 1, Item.plusminus_tally[0].vote_count
+    assert_equal 1, Item.plusminus_tally[0].plusminus
+  end
+
+  def test_plusminus_tally_voting_against
+    user1 = User.create(:name => 'david')
+    user2 = User.create(:name => 'john')
+    item = Item.create(:name => 'Playstation', :description => 'Playstation console')
+
+    assert_not_nil user1.vote_against(item)
+    assert_not_nil user2.vote_against(item)
+
+    assert_equal 2, Item.plusminus_tally[0].vote_count
+    assert_equal -2, Item.plusminus_tally[0].plusminus
   end
 
   def test_plusminus_tally_default_ordering
-    user = User.create(:name => 'david')
+    user1 = User.create(:name => 'david')
+    user2 = User.create(:name => 'john')
+    item_twice_for = Item.create(:name => 'XBOX2', :description => 'XBOX2 console')
     item_for = Item.create(:name => 'XBOX', :description => 'XBOX console')
     item_against = Item.create(:name => 'Playstation', :description => 'Playstation console')
 
-    assert_not_nil user.vote_for(item_for)
-    assert_not_nil user.vote_against(item_against)
+    assert_not_nil user1.vote_for(item_for)
+    assert_not_nil user1.vote_for(item_twice_for)
+    assert_not_nil user2.vote_for(item_twice_for)
+    assert_not_nil user1.vote_against(item_against)
 
-    assert_equal item_for, Item.plusminus_tally[0]
-    assert_equal item_against, Item.plusminus_tally[1]
+    assert_equal item_twice_for, Item.plusminus_tally[0]
+    assert_equal item_for, Item.plusminus_tally[1]
+    assert_equal item_against, Item.plusminus_tally[2]
   end
   
   def test_plusminus_tally_limit
@@ -220,7 +250,7 @@ class TestThumbsUp < Test::Unit::TestCase
     items = (0..9).map{ |u| Item.create(:name => "Item #{u}", :description => "Item #{u}") }
     users.each{ |u| items.each { |i| u.vote_for(i) } }
     assert_equal 10, Item.plusminus_tally.length
-    assert_equal 2, Item.plusminus_tally(:limit => 2).length
+    assert_equal 2, Item.plusminus_tally.limit(2).length
   end
 
   def test_plusminus_tally_ascending_ordering
@@ -231,8 +261,8 @@ class TestThumbsUp < Test::Unit::TestCase
     assert_not_nil user.vote_for(item_for)
     assert_not_nil user.vote_against(item_against)
 
-    assert_equal item_for, Item.plusminus_tally(:ascending => true)[1]
-    assert_equal item_against, Item.plusminus_tally(:ascending => true)[0]
+    assert_equal item_for, Item.plusminus_tally.reorder('plusminus ASC')[1]
+    assert_equal item_against, Item.plusminus_tally.reorder('plusminus ASC')[0]
   end
   
   def test_karma
