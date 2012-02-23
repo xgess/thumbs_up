@@ -27,6 +27,7 @@ end
  
 task :release => :build do
   system "gem push thumbs_up-#{ThumbsUp::VERSION}.gem"
+  system "rm thumbs_up-#{ThumbsUp::VERSION}.gem"
 end
 
 task :default => :test
