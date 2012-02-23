@@ -43,7 +43,6 @@ module ThumbsUp
         t = t.order("vote_count DESC")
         t = t.group("#{self.table_name}.id")
         t = t.select("#{self.table_name}.*")
-        t = t.select("#{Vote.table_name}.*")
         t = t.select("COUNT(#{Vote.table_name}.id) AS vote_count")
       end
 
