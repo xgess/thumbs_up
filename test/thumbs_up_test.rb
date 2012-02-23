@@ -103,6 +103,16 @@ class TestThumbsUp < Test::Unit::TestCase
     assert_equal 0, Item.tally.having('vote_count > 0').length
   end
 
+  def test_tally_has_id
+    item1 = Item.create(:name => 'XBOX', :description => 'XBOX console')
+    item2 = Item.create(:name => 'XBOX2', :description => 'XBOX2 console')
+    user = User.create(:name => 'david')
+
+    user.vote_for(item2)
+
+    assert_not_nil Item.tally.all.first.id
+  end
+
   def test_tally_starts_at
     item = Item.create(:name => 'XBOX', :description => 'XBOX console')
     user = User.create(:name => 'david')
