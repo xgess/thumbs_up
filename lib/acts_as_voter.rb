@@ -92,6 +92,8 @@ module ThumbsUp #:nodoc:
         ).map(&:destroy)
       end
 
+      alias_method :clear_votes, :unvote_for
+
       def voted_which_way?(voteable, direction)
         raise ArgumentError, "expected :up or :down" unless [:up, :down].include?(direction)
         0 < Vote.where(
