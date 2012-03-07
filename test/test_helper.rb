@@ -7,13 +7,21 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'active_record'
 
-config = {
-  :adapter => 'mysql2',
-  :database => 'thumbs_up_test',
-  :username => 'test',
-  :password => 'test',
-  :socket => '/tmp/mysql.sock'
-}
+if ENV['TRAVIS']
+  config = {
+    :adapter => 'mysql2',
+    :database => 'thumbs_up_test',
+    :username => 'root'
+  }
+else
+  config = {
+    :adapter => 'mysql2',
+    :database => 'thumbs_up_test',
+    :username => 'test',
+    :password => 'test',
+    :socket => '/tmp/mysql.sock'
+  }
+end
 
 ActiveRecord::Base.establish_connection(config)
 ActiveRecord::Base.connection.drop_database config[:database] rescue nil
