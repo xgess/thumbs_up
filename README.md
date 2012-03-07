@@ -1,6 +1,8 @@
 ThumbsUp
 =======
 
+[![Build Status](https://secure.travis-ci.org/brady8/thumbs_up.png)](http://travis-ci.org/brady8/thumbs_up)
+
 **Note: Version 0.5.x is a breaking change for #plusminus_tally and #tally, with > 50% speedups.**
 
 A ridiculously straightforward and simple package 'o' code to enable voting in your application, a la stackoverflow.com, etc.
