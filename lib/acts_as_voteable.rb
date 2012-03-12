@@ -24,10 +24,10 @@ module ThumbsUp
       # Post.plusminus_tally(:separate_updown => true)
       def plusminus_tally(params = {})
         t = self.joins("LEFT OUTER JOIN #{Vote.table_name} ON #{self.table_name}.id = #{Vote.table_name}.voteable_id")
-        t = t.order("plusminus DESC")
+        t = t.order("plusminus_tally DESC")
         t = t.group("#{self.table_name}.id")
         t = t.select("#{self.table_name}.*")
-        t = t.select("SUM(CASE CAST(#{Vote.table_name}.vote AS UNSIGNED) WHEN 1 THEN 1 WHEN 0 THEN -1 ELSE 0 END) AS plusminus")
+        t = t.select("SUM(CASE CAST(#{Vote.table_name}.vote AS UNSIGNED) WHEN 1 THEN 1 WHEN 0 THEN -1 ELSE 0 END) AS plusminus_tally")
         if params[:separate_updown]
           t = t.select("SUM(CASE CAST(#{Vote.table_name}.vote AS UNSIGNED) WHEN 1 THEN 1 WHEN 0 THEN 0 ELSE 0 END) AS up")
           t = t.select("SUM(CASE CAST(#{Vote.table_name}.vote AS UNSIGNED) WHEN 1 THEN 0 WHEN 0 THEN 1 ELSE 0 END) AS down")

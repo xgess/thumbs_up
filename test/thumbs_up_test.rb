@@ -271,8 +271,8 @@ class TestThumbsUp < Test::Unit::TestCase
     assert_not_nil user.vote_for(item_for)
     assert_not_nil user.vote_against(item_against)
 
-    assert_equal item_for, Item.plusminus_tally.reorder('plusminus ASC')[1]
-    assert_equal item_against, Item.plusminus_tally.reorder('plusminus ASC')[0]
+    assert_equal item_for, Item.plusminus_tally.reorder('plusminus_tally ASC')[1]
+    assert_equal item_against, Item.plusminus_tally.reorder('plusminus_tally ASC')[0]
   end
   
   def test_karma
