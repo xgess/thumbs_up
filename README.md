@@ -100,15 +100,16 @@ This will select the Items with less than 10 votes, the votes having been cast w
 
 **You most likely want to use this over the normal tally**
 
-This is similar to tallying votes, but this will return voteable object collections based on the sum of the differences between up and down votes (ups are +1, downs are -1). For Instance, a voteable with 3 upvotes and 2 downvotes will have a plusminus of 1.
+This is similar to tallying votes, but this will return voteable object collections based on the sum of the differences between up and down votes (ups are +1, downs are -1). For Instance, a voteable with 3 upvotes and 2 downvotes will have a plusminus_tally of 1.
 
-    @items = Item.plusminus_tally.limit(10).where('created_at > ?', 2.days.ago).having('plusminus > 10')
+    @items = Item.plusminus_tally.limit(10).where('created_at > ?', 2.days.ago).having('plusminus_tally > 10')
 
 #### Lower level queries
 
     positiveVoteCount = voteable.votes_for
     negativeVoteCount = voteable.votes_against
-    plusminus         = voteable.plusminus  # Votes for, minus votes against.
+    # Votes for minus votes against. If you want more than a few model instances' worth, use `plusminus_tally` instead.
+    plusminus         = voteable.plusminus
 
 	voter.voted_for?(voteable) # True if the voter voted for this object.
 	voter.vote_count(:up | :down | :all) # returns the count of +1, -1, or all votes
