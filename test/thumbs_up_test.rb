@@ -155,15 +155,15 @@ class TestThumbsUp < Test::Unit::TestCase
   end
 
   def test_tally_count
-    Item.tally.count
+    Item.tally.except(:order).count
   end
 
   def test_tally_any
-    Item.tally.any?
+    Item.tally.except(:order).any?
   end
 
   def test_tally_empty
-    Item.tally.empty?
+    Item.tally.except(:order).empty?
   end
 
   def test_plusminus_tally_not_empty_without_conditions
@@ -288,15 +288,15 @@ class TestThumbsUp < Test::Unit::TestCase
   end
 
   def test_plusminus_tally_count
-    Item.plusminus_tally.count
+    Item.plusminus_tally.except(:order).count
   end
 
   def test_plusminus_tally_any
-    Item.plusminus_tally.any?
+    Item.plusminus_tally.except(:order).any?
   end
 
   def test_plusminus_tally_empty
-    Item.plusminus_tally.empty?
+    Item.plusminus_tally.except(:order).empty?
   end
 
   def test_karma
