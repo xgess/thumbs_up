@@ -73,11 +73,13 @@ class TestThumbsUp < Test::Unit::TestCase
     assert_equal 2, item.votes_for
     assert_equal 0, item.votes_against
     assert_equal 2, item.plusminus
+    assert_in_delta 0.34, item.ci_plusminus, 0.01
 
     user_against.vote_against(item)
 
     assert_equal 1, item.votes_against
     assert_equal 1, item.plusminus
+    assert_in_delta 0.20, item.ci_plusminus, 0.01
 
     assert_equal 3, item.votes_count
 

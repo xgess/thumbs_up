@@ -81,15 +81,28 @@ module ThumbsUp
       # If you're using this for a lot of voteables, then you'd best use the #plusminus_tally
       # method above.
       def plusminus
-        votes_for - votes_against
+        respond_to?(:plusminus_tally) ? plusminus_tally : (votes_for - votes_against)
+      end
+
+      # The lower bound of a Wilson Score with a default confidence interval of 95%. Gives a more accurate representation of average rating (plusminus) based on the number of positive ratings and total ratings.
+      # http://evanmiller.org/how-not-to-sort-by-average-rating.html
+      def ci_plusminus(confidence = 0.95)
+        require 'statistics2'
+        n = votes.size
+        if n == 0
+          return 0
+        end
+        z = Statistics2.pnormaldist(1 - (1 - confidence) / 2)
+        phat = 1.0 * votes_for / n
+        (phat + z * z / (2 * n) - z * Math.sqrt((phat * (1 - phat) + z * z / (4 * n)) / n)) / (1 + z * z / n)
       end
 
       def votes_count
-        self.votes.size
+        votes.size
       end
 
       def voters_who_voted
-        self.votes.map(&:voter).uniq
+        votes.map(&:voter).uniq
       end
 
       def voted_by?(voter)
