@@ -49,6 +49,35 @@ module ThumbsUp #:nodoc:
         voted_which_way?(voteable, :down)
       end
 
+      def voted_skip?(voteable)
+        voted_value(voteable, 0)
+      end
+      def voted_low?(voteable)
+        voted_value(voteable, 1)
+      end
+      def voted_medium?(voteable)
+        voted_value(voteable, 10)
+      end
+      def voted_high?(voteable)
+        voted_value(voteable, 100)
+      end
+
+
+      def voted_value?(voteable, weight)
+       0 < Vote.where(
+              :voter_id => self.id,
+              :voter_type => self.class.base_class.name,
+              :voteable_id => voteable.id,
+              :voteable_type => voteable.class.base_class.name
+              :value => weight
+            ).count
+      end
+
+
+
+
+
+
       def voted_on?(voteable)
         0 < Vote.where(
               :voter_id => self.id,
@@ -58,30 +87,54 @@ module ThumbsUp #:nodoc:
             ).count
       end
 
-      def vote_for(voteable)
-        self.vote(voteable, { :direction => :up, :exclusive => false })
+      def vote_for(voteable, importance)
+        self.vote(voteable, { :direction => :up, :exclusive => false, :value => importance })
       end
 
-      def vote_against(voteable)
-        self.vote(voteable, { :direction => :down, :exclusive => false })
+      def vote_against(voteable, importance)
+        self.vote(voteable, { :direction => :down, :exclusive => false, :value => importance })
       end
 
-      def vote_exclusively_for(voteable)
-        self.vote(voteable, { :direction => :up, :exclusive => true })
+      def vote_exclusively_for(voteable, importance)
+        self.vote(voteable, { :direction => :up, :exclusive => true, :value => importance })
       end
 
-      def vote_exclusively_against(voteable)
-        self.vote(voteable, { :direction => :down, :exclusive => true })
+      def vote_exclusively_against(voteable, importance)
+        self.vote(voteable, { :direction => :down, :exclusive => true, :value => importance })
       end
 
       def vote(voteable, options = {})
         raise ArgumentError, "you must specify :up or :down in order to vote" unless options[:direction] && [:up, :down].include?(options[:direction].to_sym)
+        remember_tweets = 0 #because the unvote will wipe it out
+        remember_tweets = self.tweeted
         if options[:exclusive]
           self.unvote_for(voteable)
         end
         direction = (options[:direction].to_sym == :up)
-        Vote.create!(:vote => direction, :voteable => voteable, :voter => self)
+        case options[:value]
+        when "high"
+          weight = 100
+        when "medium"
+          weight = 10
+        when "low"
+          weight = 1
+        when "skip"
+          weight = 0
+        else
+          weight = 0
+        end
+        Vote.create!(:vote => direction, :voteable => voteable, :voter => self, :value => weight, :tweeted => remember_tweets)
       end
+
+      def tweet_for(voteable)
+          Vote.where(
+            :voter_id => self.id,
+            :voter_type => self.class.base_class.name,
+            :voteable_id => voteable.id,
+            :voteable_type => voteable.class.base_class.name
+          ).tweeted.increment
+      end
+
 
       def unvote_for(voteable)
         Vote.where(

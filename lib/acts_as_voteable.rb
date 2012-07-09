@@ -61,11 +61,32 @@ module ThumbsUp
     module InstanceMethods
 
       def votes_for
-        self.votes.where(:vote => true).count
+        self.votes.where(:vote => true).count - self.votes.where(:vote => true, :value => 0).count
       end
 
       def votes_against
-        self.votes.where(:vote => false).count
+        self.votes.where(:vote => false).count - self.votes.where(:vote => false, :value => 0).count
+      end
+
+      def votes_skipped
+        self.votes.where(:value => 0).count
+      end
+
+      def votes_high
+        self.votes.where(:value => 100).count
+      end
+
+      def votes_medium
+        self.votes.where(:value => 10).count
+      end
+
+      def votes_low
+        self.votes.where(:value => 1).count
+      end
+
+
+      def percent_high
+        (votes_high.to_f * 100 / (self.votes.size + 0.0001)).round
       end
 
       def percent_for
@@ -98,7 +119,8 @@ module ThumbsUp
       end
 
       def votes_count
-        votes.size
+        #votes.size
+        votes_for + votes_against
       end
 
       def voters_who_voted
