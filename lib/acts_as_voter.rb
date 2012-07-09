@@ -74,10 +74,6 @@ module ThumbsUp #:nodoc:
       end
 
 
-
-
-
-
       def voted_on?(voteable)
         0 < Vote.where(
               :voter_id => self.id,
@@ -143,7 +139,7 @@ module ThumbsUp #:nodoc:
             :voter_type => self.class.base_class.name,
             :voteable_id => voteable.id,
             :voteable_type => voteable.class.base_class.name
-          ).tweeted
+          ).first.tweeted
       end
 
       def unvote_for(voteable)
