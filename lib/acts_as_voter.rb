@@ -92,7 +92,7 @@ module ThumbsUp #:nodoc:
       end
 
       def vote_exclusively_for(voteable, importance)
-        self.vote(voteable, { :direction   => :up, :exclusive => true, :value => importance })
+        self.vote(voteable, { :direction => :up, :exclusive => true, :value => importance })
       end
 
       def vote_exclusively_against(voteable, importance)
@@ -110,13 +110,13 @@ module ThumbsUp #:nodoc:
         end
         direction = (options[:direction].to_sym == :up)
         case options[:value]
-        when "high"
+        when :high
           weight = 100
-        when "medium"
+        when :medium
           weight = 10
-        when "low"
+        when :low
           weight = 1
-        when "skip"
+        when :skip
           weight = 0
         else
           weight = 0
@@ -134,12 +134,17 @@ module ThumbsUp #:nodoc:
       end
 
       def get_tweeted(voteable)
-        Vote.where(
+        if Vote.where(
             :voter_id => self.id,
             :voter_type => self.class.base_class.name,
             :voteable_id => voteable.id,
             :voteable_type => voteable.class.base_class.name
-          ).first.tweeted
+          ).first ? Vote.where(
+            :voter_id => self.id,
+            :voter_type => self.class.base_class.name,
+            :voteable_id => voteable.id,
+            :voteable_type => voteable.class.base_class.name
+          ).first.tweeted : 0
       end
 
       def unvote_for(voteable)
