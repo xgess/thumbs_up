@@ -96,7 +96,7 @@ module ThumbsUp #:nodoc:
       end
 
       def vote_exclusively_for(voteable, importance)
-        self.vote(voteable, { :direction => :up, :exclusive => true, :value => importance })
+        self.vote(voteable, { :direction   => :up, :exclusive => true, :value => importance })
       end
 
       def vote_exclusively_against(voteable, importance)
@@ -105,8 +105,10 @@ module ThumbsUp #:nodoc:
 
       def vote(voteable, options = {})
         raise ArgumentError, "you must specify :up or :down in order to vote" unless options[:direction] && [:up, :down].include?(options[:direction].to_sym)
-        remember_tweets = 0 #because the unvote will wipe it out
-        remember_tweets = self.tweeted
+        
+        #because the unvote will wipe it out
+        remember_tweets = self.get_tweeted(voteable)
+
         if options[:exclusive]
           self.unvote_for(voteable)
         end
@@ -135,6 +137,14 @@ module ThumbsUp #:nodoc:
           ).tweeted.increment
       end
 
+      def get_tweeted(voteable)
+        Vote.where(
+            :voter_id => self.id,
+            :voter_type => self.class.base_class.name,
+            :voteable_id => voteable.id,
+            :voteable_type => voteable.class.base_class.name
+          ).tweeted
+      end
 
       def unvote_for(voteable)
         Vote.where(
