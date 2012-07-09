@@ -42,11 +42,11 @@ module ThumbsUp #:nodoc:
       end
 
       def voted_for?(voteable)
-        voted_which_way?(voteable, :up)
+        voted_skip?(voteable) ? false : voted_which_way?(voteable, :up)
       end
 
       def voted_against?(voteable)
-        voted_which_way?(voteable, :down)
+        voted_skip?(voteable) ? false : voted_which_way?(voteable, :down)
       end
 
       def voted_skip?(voteable)
@@ -68,7 +68,7 @@ module ThumbsUp #:nodoc:
               :voter_id => self.id,
               :voter_type => self.class.base_class.name,
               :voteable_id => voteable.id,
-              :voteable_type => voteable.class.base_class.name
+              :voteable_type => voteable.class.base_class.name,
               :value => weight
             ).count
       end
