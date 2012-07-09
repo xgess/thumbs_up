@@ -134,7 +134,7 @@ module ThumbsUp #:nodoc:
             :voter_type => self.class.base_class.name,
             :voteable_id => voteable.id,
             :voteable_type => voteable.class.base_class.name
-          ).tweeted.increment
+          ).increment(:tweeted)
       end
 
       def get_tweeted(voteable)
