@@ -134,7 +134,7 @@ module ThumbsUp #:nodoc:
       end
 
       def get_tweeted(voteable)
-        if Vote.where(
+        Vote.where(
             :voter_id => self.id,
             :voter_type => self.class.base_class.name,
             :voteable_id => voteable.id,
