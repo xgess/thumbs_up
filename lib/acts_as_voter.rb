@@ -50,19 +50,19 @@ module ThumbsUp #:nodoc:
       end
 
       def voted_skip?(voteable)
-        voted_value(voteable, 0)
+        voted_value?(voteable, 0)
       end
       def voted_low?(voteable)
         return false unless voted_for?(voteable)
-        voted_value(voteable, 1)
+        voted_value?(voteable, 1)
       end
       def voted_medium?(voteable)
         return false unless voted_for?(voteable)
-        voted_value(voteable, 10)
+        voted_value?(voteable, 10)
       end
       def voted_high?(voteable)
         return false unless voted_for?(voteable)
-        voted_value(voteable, 100)
+        voted_value?(voteable, 100)
       end
 
 
