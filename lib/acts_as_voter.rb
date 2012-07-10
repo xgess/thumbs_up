@@ -106,7 +106,7 @@ module ThumbsUp #:nodoc:
 
       def vote(voteable, options = {})
         raise ArgumentError, "you must specify :up or :down in order to vote" unless options[:direction] && [:up, :down].include?(options[:direction].to_sym)
-        remember_tweets = self.get_tweeted(voteable) #because the unvote will wipe it out
+        remember_tweet = self.tweeted?(voteable) #because the unvote will wipe it out
         if options[:exclusive]
           self.unvote_for(voteable)
         end
@@ -125,17 +125,23 @@ module ThumbsUp #:nodoc:
         else
           weight = 0
         end
-        Vote.create!(:vote => direction, :voteable => voteable, :voter => self, :value => weight, :tweeted => remember_tweets)
+        Vote.create!(:vote => direction, :voteable => voteable, :voter => self, :value => weight, :tweeted => remember_tweet)
       end
 
       def tweet_for(voteable)
+          vote_exclusively_for(voteable, :skip) unless 
+              Vote.where(
+                  :voter_id => self.id,
+                  :voter_type => self.class.base_class.name,
+                  :voteable_id => voteable.id,
+                  :voteable_type => voteable.class.base_class.name).count > 0
           Vote.where(
-            :voter_id => self.id,
-            :voter_type => self.class.base_class.name,
-            :voteable_id => voteable.id,
-            :voteable_type => voteable.class.base_class.name
-          ).increment(:tweeted)
+                :voter_id => self.id,
+                :voter_type => self.class.base_class.name,
+                :voteable_id => voteable.id,
+                :voteable_type => voteable.class.base_class.name).first.tweeted = true
       end
+
 
       def tweeted?(voteable)
         Vote.where(

@@ -69,13 +69,10 @@ module ThumbsUp
       end
 
       def tweets_for
-        Vote.where(
-              :voteable_id => self.id,
-              :voteable_type => self.class.base_class.name
-            ).count - Vote.where(
+          Vote.where(
               :voteable_id => self.id,
               :voteable_type => self.class.base_class.name,
-              :tweeted => 0
+              :tweeted => true
             ).count
       end
 
@@ -158,7 +155,7 @@ module ThumbsUp
             :voter_type => voter.class.base_class.name,
             :voteable_id => self.id,
             :voteable_type => self.class.base_class.name
-          ).first.tweeted : 0
+          ).first.tweeted : false
       end
 
     end

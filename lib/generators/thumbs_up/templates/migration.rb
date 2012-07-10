@@ -4,7 +4,7 @@ class ThumbsUpMigration < ActiveRecord::Migration
       
       t.boolean    :vote,     :default => false
       t.integer    :value,    :default => 0
-      t.integer    :tweeted,  :default => 0 #count just in case they tweet multiple times!
+      t.boolean    :tweeted,  :default => false
       
       t.references :voteable, :polymorphic => true, :null => false
       t.references :voter,    :polymorphic => true
