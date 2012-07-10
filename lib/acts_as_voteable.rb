@@ -68,20 +68,32 @@ module ThumbsUp
         self.votes.where(:vote => false).count - self.votes.where(:vote => false, :value => 0).count
       end
 
+      def tweets_for
+        Vote.where(
+              :voteable_id => self.id,
+              :voteable_type => self.class.base_class.name
+            ).count - Vote.where(
+              :voteable_id => self.id,
+              :voteable_type => self.class.base_class.name,
+              :tweeted => 0
+            ).count
+      end
+
+
       def votes_skipped
         self.votes.where(:value => 0).count
       end
 
       def votes_high
-        self.votes.where(:value => 100).count
+        self.votes.where(:value => 100, :vote => true).count
       end
 
       def votes_medium
-        self.votes.where(:value => 10).count
+        self.votes.where(:value => 10, :vote => true).count
       end
 
       def votes_low
-        self.votes.where(:value => 1).count
+        self.votes.where(:value => 1, :vote => true).count
       end
 
 
@@ -133,6 +145,20 @@ module ThumbsUp
               :voteable_type => self.class.base_class.name,
               :voter_id => voter.id
             ).count
+      end
+
+      def tweeted_by?(voter)
+        Vote.where(
+            :voter_id => voter.id,
+            :voter_type => voter.class.base_class.name,
+            :voteable_id => self.id,
+            :voteable_type => self.class.base_class.name
+          ).first ? Vote.where(
+            :voter_id => voter.id,
+            :voter_type => voter.class.base_class.name,
+            :voteable_id => self.id,
+            :voteable_type => self.class.base_class.name
+          ).first.tweeted : 0
       end
 
     end

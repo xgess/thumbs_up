@@ -53,12 +53,15 @@ module ThumbsUp #:nodoc:
         voted_value(voteable, 0)
       end
       def voted_low?(voteable)
+        return false unless voted_for?(voteable)
         voted_value(voteable, 1)
       end
       def voted_medium?(voteable)
+        return false unless voted_for?(voteable)
         voted_value(voteable, 10)
       end
       def voted_high?(voteable)
+        return false unless voted_for?(voteable)
         voted_value(voteable, 100)
       end
 
@@ -87,7 +90,8 @@ module ThumbsUp #:nodoc:
         self.vote(voteable, { :direction => :up, :exclusive => false, :value => importance })
       end
 
-      def vote_against(voteable, importance)
+      def vote_against(voteable, importance=:against)
+        importance=:against
         self.vote(voteable, { :direction => :down, :exclusive => false, :value => importance })
       end
 
@@ -95,16 +99,14 @@ module ThumbsUp #:nodoc:
         self.vote(voteable, { :direction => :up, :exclusive => true, :value => importance })
       end
 
-      def vote_exclusively_against(voteable, importance)
+      def vote_exclusively_against(voteable, importance=:against)
+        importance=:against
         self.vote(voteable, { :direction => :down, :exclusive => true, :value => importance })
       end
 
       def vote(voteable, options = {})
         raise ArgumentError, "you must specify :up or :down in order to vote" unless options[:direction] && [:up, :down].include?(options[:direction].to_sym)
-        
-        #because the unvote will wipe it out
-        remember_tweets = self.get_tweeted(voteable)
-
+        remember_tweets = self.get_tweeted(voteable) #because the unvote will wipe it out
         if options[:exclusive]
           self.unvote_for(voteable)
         end
@@ -116,6 +118,8 @@ module ThumbsUp #:nodoc:
           weight = 10
         when :low
           weight = 1
+        when :against
+          weight = -1
         when :skip
           weight = 0
         else
@@ -133,7 +137,7 @@ module ThumbsUp #:nodoc:
           ).increment(:tweeted)
       end
 
-      def get_tweeted(voteable)
+      def tweeted?(voteable)
         Vote.where(
             :voter_id => self.id,
             :voter_type => self.class.base_class.name,
