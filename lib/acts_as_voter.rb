@@ -139,7 +139,7 @@ module ThumbsUp #:nodoc:
                 :voter_id => self.id,
                 :voter_type => self.class.base_class.name,
                 :voteable_id => voteable.id,
-                :voteable_type => voteable.class.base_class.name).first.tweeted = true
+                :voteable_type => voteable.class.base_class.name).first.increment(:tweeted)
       end
 
 
