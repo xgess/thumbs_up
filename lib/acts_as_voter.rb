@@ -112,21 +112,25 @@ module ThumbsUp #:nodoc:
         end
         direction = (options[:direction].to_sym == :up)
         case options[:value]
-        when :high
-          weight = 100
-        when :medium
-          weight = 10
-        when :low
-          weight = 1
-        when :against
-          weight = -1
-        when :skip
-          weight = 0
-        else
-          weight = 0
+          when :high
+            weight = 100
+          when :medium
+            weight = 10
+          when :low
+            weight = 1
+          when :against
+            weight = -1
+          when :skip
+            weight = 0
+          else
+            weight = 0
         end
-        Vote.create!(:vote => direction, :voteable => voteable, :voter => self, :value => weight, :tweeted => remember_tweet)
+        @vote = Vote.create(:vote => direction, :value => weight, :tweeted => remember_tweet)
+        @vote.voteable = voteable
+        @vote.voter = self
+        @vote.save!
       end
+
 
       def tweet_for(voteable)
           vote_exclusively_for(voteable, :skip) unless 
