@@ -131,10 +131,11 @@ module ThumbsUp #:nodoc:
         puts voteable
         puts self
         @vote = Vote.new(:vote => direction, :value => weight, :tweeted => remember_tweet)
-        @vote.voteable = voteable
-        @vote.voter = self
-        puts @vote
-        @vote.save!
+        
+        # @vote.voteable = voteable
+        # @vote.voter = self
+        # puts @vote
+        # @vote.save!
       end
 
 
