@@ -139,7 +139,6 @@ module ThumbsUp #:nodoc:
         #send it back to the user model
         #self.actual_vote_recorded(direction, weight, remember_tweet, voteable)
         @vote = Vote.new(:vote => direction, :value => weight, :tweeted => remember_tweet)
-        @vote.make_a_vote
         @vote.voteable = voteable
         @vote.voter = self
         puts @vote
