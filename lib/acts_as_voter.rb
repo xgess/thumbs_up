@@ -97,7 +97,7 @@ module ThumbsUp #:nodoc:
 
       def vote_exclusively_for(voteable, importance)
         puts "vote_exclusively_for"
-        self.vote(voteable, { :direction => :up, :exclusive => true, :value => importance })
+        #self.vote(voteable, { :direction => :up, :exclusive => true, :value => importance })
       end
 
       def vote_exclusively_against(voteable, importance=:against)
