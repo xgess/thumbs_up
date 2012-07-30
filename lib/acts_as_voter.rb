@@ -96,6 +96,7 @@ module ThumbsUp #:nodoc:
       end
 
       def vote_exclusively_for(voteable, importance)
+        puts "vote_exclusively_for"
         self.vote(voteable, { :direction => :up, :exclusive => true, :value => importance })
       end
 
@@ -105,11 +106,16 @@ module ThumbsUp #:nodoc:
       end
 
       def vote(voteable, options = {})
+        puts "vote"
+
         raise ArgumentError, "you must specify :up or :down in order to vote" unless options[:direction] && [:up, :down].include?(options[:direction].to_sym)
         remember_tweet = self.tweeted?(voteable) #because the unvote will wipe it out
+        
         if options[:exclusive]
           self.unvote_for(voteable)
         end
+        puts "unvoted"
+
         direction = (options[:direction].to_sym == :up)
         case options[:value]
           when :high
@@ -130,8 +136,10 @@ module ThumbsUp #:nodoc:
         puts remember_tweet
         puts voteable
         puts self
+        #send it back to the user model
+        self.actual_vote_recorded(direction, weight, remember_tweet, voteable)
         #@vote = Vote.new(:vote => direction, :value => weight, :tweeted => remember_tweet)
-        @vote.make_a_vote
+        #@vote.make_a_vote
         # @vote.voteable = voteable
         # @vote.voter = self
         # puts @vote
@@ -169,6 +177,8 @@ module ThumbsUp #:nodoc:
       end
 
       def unvote_for(voteable)
+        puts "unvote_for"
+
         Vote.where(
           :voter_id => self.id,
           :voter_type => self.class.base_class.name,
