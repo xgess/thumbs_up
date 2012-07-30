@@ -130,8 +130,8 @@ module ThumbsUp #:nodoc:
         puts remember_tweet
         puts voteable
         puts self
-        @vote = Vote.new(:vote => direction, :value => weight, :tweeted => remember_tweet)
-        
+        #@vote = Vote.new(:vote => direction, :value => weight, :tweeted => remember_tweet)
+        @vote.make_a_vote
         # @vote.voteable = voteable
         # @vote.voter = self
         # puts @vote
