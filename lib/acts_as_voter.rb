@@ -97,7 +97,7 @@ module ThumbsUp #:nodoc:
 
       def vote_exclusively_for(voteable, importance)
         puts "vote_exclusively_for"
-        #self.vote(voteable, { :direction => :up, :exclusive => true, :value => importance })
+        self.vote(voteable, { :direction => :up, :exclusive => true, :value => importance })
       end
 
       def vote_exclusively_against(voteable, importance=:against)
@@ -137,13 +137,13 @@ module ThumbsUp #:nodoc:
         puts voteable
         puts self
         #send it back to the user model
-        self.actual_vote_recorded(direction, weight, remember_tweet, voteable)
-        #@vote = Vote.new(:vote => direction, :value => weight, :tweeted => remember_tweet)
-        #@vote.make_a_vote
-        # @vote.voteable = voteable
-        # @vote.voter = self
-        # puts @vote
-        # @vote.save!
+        #self.actual_vote_recorded(direction, weight, remember_tweet, voteable)
+        @vote = Vote.new(:vote => direction, :value => weight, :tweeted => remember_tweet)
+        @vote.make_a_vote
+        @vote.voteable = voteable
+        @vote.voter = self
+        puts @vote
+        @vote.save!
       end
 
 
