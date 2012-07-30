@@ -125,7 +125,7 @@ module ThumbsUp #:nodoc:
           else
             weight = 0
         end
-        @vote = Vote.create(:vote => direction, :value => weight, :tweeted => remember_tweet)
+        @vote = Vote.new(:vote => direction, :value => weight, :tweeted => remember_tweet)
         @vote.voteable = voteable
         @vote.voteable_id = voteable.id
         @vote.voter = self
