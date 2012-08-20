@@ -1,3 +1,8 @@
+forked and edited for use with agree the people.
+i added in some extra voting options aside from just up and down. now the votes are stored as an integer point value instead of boolean, and there are high, medium, low, 0, and negative.
+
+
+
 ThumbsUp
 =======
 
