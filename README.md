@@ -1,4 +1,3 @@
-
 This is an extension (actually more of a replacement) of the popular voting gem to handle a Likert scale with 5 levels. 
 The vote can be passed using a symbol for :high, :medium, :low, :against, or :skip with each of these
 values actually being stored in the database as numbers (100, 10, 1, -1, and 0 respectively).
@@ -6,6 +5,11 @@ values actually being stored in the database as numbers (100, 10, 1, -1, and 0 r
 I'm not going to make a pull request on the original because this is such a big extension, it would 
 likely just be overkill for most current users. It works beautifully for AgreeThePeople, though. 
 
+
+
+------------------------------------------
+
+------------------------------------------
 
 
 ThumbsUp
